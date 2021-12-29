@@ -1,13 +1,16 @@
 import { task, dest, src, series, parallel } from 'gulp';
 import { createProject } from 'gulp-typescript';
 import { exec } from 'child_process';
+import { init, write } from 'gulp-sourcemaps';
 
 task('compile', () => {
     const tsProject = createProject('tsconfig.json');
-    const tsResult = tsProject.src()
-        .pipe(tsProject());
 
-    return tsResult.js.pipe(dest('./build'));
+    return tsProject.src()
+        .pipe(init())
+        .pipe(tsProject())
+        .pipe(write())
+        .pipe(dest('./build'));
 });
 
 task('move-package', () => {

@@ -1,4 +1,4 @@
-import { lambdaHandler } from '../app';
+import { lambdaHandler } from '../create';
 import { APIGatewayProxyEvent } from 'aws-lambda';
 
 let event: APIGatewayProxyEvent;

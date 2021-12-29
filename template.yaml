@@ -11,19 +11,47 @@ Globals:
     Timeout: 3
 
 Resources:
-  HelloWorldFunction:
+  PlayerCreateFunction:
     Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
     Properties:
-      CodeUri: hello-world/build/src
-      Handler: app.lambdaHandler
+      CodeUri: players/build/src
+      Handler: create.lambdaHandler
       Runtime: nodejs14.x
       Architectures:
         - arm64
       Events:
-        HelloWorld:
+        PlayerCreate:
           Type: Api # More info about API Event Source: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#api
           Properties:
-            Path: /hello
+            Path: /player
+            Method: post
+  PlayerValidateFunction:
+    Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
+    Properties:
+      CodeUri: players/build/src
+      Handler: validate.lambdaHandler
+      Runtime: nodejs14.x
+      Architectures:
+        - arm64
+      Events:
+        PlayerValidate:
+          Type: Api # More info about API Event Source: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#api
+          Properties:
+            Path: /player/validate
+            Method: post
+  PlayerGetFunction:
+    Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
+    Properties:
+      CodeUri: players/build/src
+      Handler: get.lambdaHandler
+      Runtime: nodejs14.x
+      Architectures:
+        - arm64
+      Events:
+        PlayerGet:
+          Type: Api # More info about API Event Source: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#api
+          Properties:
+            Path: /player
             Method: get
 
 Outputs:

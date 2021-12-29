@@ -1,6 +1,6 @@
 .PHONY: build
 build:
-	pushd hello-world; \
+	pushd players; \
 	npm install; \
 	npx gulp; \
 	popd; \

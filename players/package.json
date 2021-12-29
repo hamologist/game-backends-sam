@@ -7,12 +7,12 @@
   },
   "version": "1.0.0",
   "description": "hello world sample for NodeJS",
-  "main": "src/app.ts",
+  "main": "src/create.ts",
   "repository": "https://github.com/awslabs/aws-sam-cli/tree/develop/samcli/local/init/templates/cookiecutter-aws-sam-hello-nodejs",
   "author": "SAM CLI",
   "license": "MIT",
   "dependencies": {
-    "@types/jest": "^27.0.3",
+    "aws-sdk": "^2.1048.0",
     "axios": "^0.21.1"
   },
   "scripts": {
@@ -22,8 +22,11 @@
   "devDependencies": {
     "@types/aws-lambda": "^8.10.88",
     "@types/gulp": "^4.0.9",
+    "@types/gulp-sourcemaps": "^0.0.35",
+    "@types/jest": "^27.0.3",
     "@types/node": "^17.0.1",
     "gulp": "^4.0.2",
+    "gulp-sourcemaps": "^3.0.0",
     "gulp-typescript": "^6.0.0-alpha.1",
     "jest": "^27.4.5",
     "ts-jest": "^27.1.2",
