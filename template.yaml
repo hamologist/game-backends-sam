@@ -14,8 +14,8 @@ Resources:
   PlayerCreateFunction:
     Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
     Properties:
-      CodeUri: players/build/src
-      Handler: create.lambdaHandler
+      CodeUri: players/build
+      Handler: src/create.lambdaHandler
       Runtime: nodejs14.x
       Architectures:
         - arm64
@@ -28,8 +28,8 @@ Resources:
   PlayerValidateFunction:
     Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
     Properties:
-      CodeUri: players/build/src
-      Handler: validate.lambdaHandler
+      CodeUri: players/build
+      Handler: src/validate.lambdaHandler
       Runtime: nodejs14.x
       Architectures:
         - arm64
@@ -42,8 +42,8 @@ Resources:
   PlayerGetFunction:
     Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
     Properties:
-      CodeUri: players/build/src
-      Handler: get.lambdaHandler
+      CodeUri: players/build
+      Handler: src/get.lambdaHandler
       Runtime: nodejs14.x
       Architectures:
         - arm64

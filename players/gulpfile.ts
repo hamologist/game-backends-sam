@@ -1,4 +1,4 @@
-import { task, dest, src, series, parallel } from 'gulp';
+import { task, dest, src, series, parallel, watch } from 'gulp';
 import { createProject } from 'gulp-typescript';
 import { exec } from 'child_process';
 import { init, write } from 'gulp-sourcemaps';
@@ -11,6 +11,9 @@ task('compile', () => {
         .pipe(tsProject())
         .pipe(write())
         .pipe(dest('./build'));
+});
+task('watch-compile', () => {
+    watch('./src/**.ts', series(['compile']));
 });
 
 task('move-package', () => {
