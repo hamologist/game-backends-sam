@@ -1,0 +1,26 @@
+{
+  "AttributeDefinitions": [
+    {
+      "AttributeName": "Id",
+      "AttributeType": "S"
+    }
+  ],
+  "TableName": "GameStates",
+  "KeySchema": [
+    {
+      "AttributeName": "Id",
+      "KeyType": "HASH"
+    }
+  ],
+  "ProvisionedThroughput": {
+    "ReadCapacityUnits": 1,
+    "WriteCapacityUnits": 1
+  },
+  "Tags": [
+    {
+      "Key": "Table",
+      "Value": "GameStates"
+    }
+  ],
+  "TableClass": "STANDARD"
+}

@@ -14,8 +14,8 @@ Resources:
   PlayerCreateFunction:
     Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
     Properties:
-      CodeUri: players/build
-      Handler: src/create.lambdaHandler
+      CodeUri: backends/build
+      Handler: players/src/create.lambdaHandler
       Runtime: nodejs14.x
       Architectures:
         - arm64
@@ -28,8 +28,8 @@ Resources:
   PlayerValidateFunction:
     Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
     Properties:
-      CodeUri: players/build
-      Handler: src/validate.lambdaHandler
+      CodeUri: backends/build
+      Handler: players/src/validate.lambdaHandler
       Runtime: nodejs14.x
       Architectures:
         - arm64
@@ -42,8 +42,8 @@ Resources:
   PlayerGetFunction:
     Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
     Properties:
-      CodeUri: players/build
-      Handler: src/get.lambdaHandler
+      CodeUri: backends/build
+      Handler: players/src/get.lambdaHandler
       Runtime: nodejs14.x
       Architectures:
         - arm64
@@ -52,7 +52,63 @@ Resources:
           Type: Api # More info about API Event Source: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#api
           Properties:
             Path: /player
-            Method: get
+            Method: post
+  TicTacToeGetFunction:
+    Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
+    Properties:
+      CodeUri: backends/build
+      Handler: tic-tac-toe/src/get.lambdaHandler
+      Runtime: nodejs14.x
+      Architectures:
+        - arm64
+      Events:
+        TicTacToeGet:
+          Type: Api # More info about API Event Source: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#api
+          Properties:
+            Path: /tic-tac-toe
+            Method: post
+  TicTacToeJoinGameFunction:
+    Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
+    Properties:
+      CodeUri: backends/build
+      Handler: tic-tac-toe/src/join-game.lambdaHandler
+      Runtime: nodejs14.x
+      Architectures:
+        - arm64
+      Events:
+        TicTacToeJoinGame:
+          Type: Api # More info about API Event Source: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#api
+          Properties:
+            Path: /tic-tac-toe/join-game
+            Method: post
+  TicTacToeMakeMoveFunction:
+    Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
+    Properties:
+      CodeUri: backends/build
+      Handler: tic-tac-toe/src/make-move.lambdaHandler
+      Runtime: nodejs14.x
+      Architectures:
+        - arm64
+      Events:
+        TicTacToeMakeMove:
+          Type: Api # More info about API Event Source: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#api
+          Properties:
+            Path: /tic-tac-toe/make-move
+            Method: post
+  TicTacToeNewGameFunction:
+    Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
+    Properties:
+      CodeUri: backends/build
+      Handler: tic-tac-toe/src/new-game.lambdaHandler
+      Runtime: nodejs14.x
+      Architectures:
+        - arm64
+      Events:
+        TicTacToeNewGame:
+          Type: Api # More info about API Event Source: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#api
+          Properties:
+            Path: /tic-tac-toe/new-game
+            Method: post
 
 Outputs:
   # ServerlessRestApi is an implicit API created out of Events key under Serverless::Function

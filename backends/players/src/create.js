@@ -39,7 +39,7 @@ exports.__esModule = true;
 exports.lambdaHandler = void 0;
 var dynamodb_1 = require("aws-sdk/clients/dynamodb");
 var crypto_1 = require("crypto");
-var event_processor_1 = require("./services/event-processor");
+var event_processor_1 = require("../../shared/src/services/event-processor");
 var lambdaHandler = function (event) { return __awaiter(void 0, void 0, void 0, function () {
     var body, message, playerId, playerSecret, params, docClient, err_1;
     return __generator(this, function (_a) {

@@ -1,11 +1,11 @@
 import { APIGatewayProxyEvent, APIGatewayProxyResult } from 'aws-lambda';
-import { eventProcessor } from './services/event-processor';
-import { createPlayer } from './models/players';
+import { eventProcessor } from '../../shared/src/services/event-processor';
+import { createPlayer } from '../../shared/src/models/players';
 import {
     createErrorResponse,
     createSuccessResponse,
     SUCCESS_MESSAGE
-} from './utilities/response-helpers';
+} from '../../shared/src/utilities/response-helpers';
 
 export const lambdaHandler = async (
     event: APIGatewayProxyEvent

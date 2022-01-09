@@ -7,7 +7,7 @@
   },
   "version": "1.0.0",
   "description": "hello world sample for NodeJS",
-  "main": "src/create.ts",
+  "main": "players/src/create.ts",
   "repository": "https://github.com/awslabs/aws-sam-cli/tree/develop/samcli/local/init/templates/cookiecutter-aws-sam-hello-nodejs",
   "author": "SAM CLI",
   "license": "MIT",
@@ -17,8 +17,8 @@
     "axios": "^0.21.1"
   },
   "scripts": {
-    "test": "mocha tests/unit",
-    "compile": "tsc"
+    "test": "mocha players/tests/unit",
+    "compile": "players/node_modules/.bin/tsc"
   },
   "devDependencies": {
     "@types/aws-lambda": "^8.10.88",

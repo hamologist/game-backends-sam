@@ -1,23 +1,23 @@
 import { APIGatewayProxyEvent, APIGatewayProxyResult } from 'aws-lambda';
-import { eventProcessor } from './services/event-processor';
+import { eventProcessor } from '../../shared/src/services/event-processor';
 import {
     createErrorResponse,
     createSuccessResponse,
     SUCCESS_MESSAGE
-} from './utilities/response-helpers';
-import { getPlayer } from './models/players';
+} from '../../shared/src/utilities/response-helpers';
+import { getGame } from '../../shared/src/models/gameStates';
 
 export const lambdaHandler = async (
     event: APIGatewayProxyEvent
 ): Promise<APIGatewayProxyResult> => {
-    let body: { playerId: string };
+    let body: { gameStateId: string };
     try {
         body = eventProcessor<typeof body>({
             type: 'object',
             properties: {
-                playerId: { type: 'string' }
+                gameStateId: { type: 'string' }
             },
-            required: ['playerId'],
+            required: ['gameStateId'],
             additionalProperties: false
         }, event);
     } catch (err) {
@@ -25,11 +25,11 @@ export const lambdaHandler = async (
     }
 
     try {
-        const result = await getPlayer(body.playerId);
-        if (result === null) {
-            return createErrorResponse('Provided playerId does not exist.')
+        const gameState = await getGame(body.gameStateId);
+        if (gameState === null) {
+            return createErrorResponse('Provided gameStateId does not exist.')
         }
-        return createSuccessResponse(SUCCESS_MESSAGE, { username: result.username });
+        return createSuccessResponse(SUCCESS_MESSAGE, { gameState });
     } catch (err) {
         return createErrorResponse(err);
     }

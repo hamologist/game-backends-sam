@@ -1,7 +1,10 @@
 import { APIGatewayProxyEvent, APIGatewayProxyResult } from 'aws-lambda';
-import { eventProcessor } from './services/event-processor';
-import { createErrorResponse, createSuccessResponse } from './utilities/response-helpers';
-import { getPlayer } from './models/players';
+import { eventProcessor } from '../../shared/src/services/event-processor';
+import {
+    createErrorResponse,
+    createSuccessResponse
+} from '../../shared/src/utilities/response-helpers';
+import { playerValidator } from '../../shared/src/services/player-validator';
 
 export const lambdaHandler = async (
     event: APIGatewayProxyEvent
@@ -22,8 +25,7 @@ export const lambdaHandler = async (
     }
 
     try {
-        const result = await getPlayer(body.playerId);
-        if (result === null || result.secret !== body.playerSecret) {
+        if (!await playerValidator(body.playerId, body.playerSecret)) {
             return createSuccessResponse('Invalid')
         }
         return createSuccessResponse('Valid');
