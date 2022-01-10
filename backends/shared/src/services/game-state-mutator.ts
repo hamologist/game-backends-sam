@@ -1,5 +1,6 @@
 import {
     addPlayer,
+    createGame as _createGame,
     GameStateResult,
     getGame,
     Players,
@@ -9,6 +10,33 @@ import {
 import { getPlayer } from '../models/player';
 import { playerValidator } from './player-validator';
 import { processPlayerMove } from '../../../tic-tac-toe/src/services/process-player-move';
+
+export const createGame = async (
+    playerId: string,
+    playerSecret: string,
+): Promise<GameStateResult> => {
+    if (!await playerValidator(playerId, playerSecret)) {
+        throw new Error('Invalid player provided');
+    }
+
+    return _createGame(playerId);
+};
+
+export const joinGame = async (
+    gameStateId: string,
+    playerId: string,
+    playerSecret: string,
+): Promise<GameStateResult> => {
+    if (await playerValidator(playerId, playerSecret) === null) {
+        throw new Error('Player doesn\'t exist');
+    }
+
+    if (await getGame(gameStateId) === null) {
+        throw new Error('Game doesn\'t exist');
+    }
+
+    return addPlayer(gameStateId, playerId);
+};
 
 export const makeMove = async (
     gameStateId: string,
@@ -47,19 +75,4 @@ export const makeMove = async (
 
     processPlayerMove({ x, y }, gameState.state);
     return updateState(gameStateId, gameState.state);
-}
-
-export const joinGame = async (
-    gameStateId: string,
-    playerId: string,
-): Promise<GameStateResult> => {
-    if (await getPlayer(playerId) === null) {
-        throw new Error('Player doesn\'t exist');
-    }
-
-    if (await getGame(gameStateId) === null) {
-        throw new Error('Game doesn\'t exist');
-    }
-
-    return addPlayer(gameStateId, playerId);
-}
+};

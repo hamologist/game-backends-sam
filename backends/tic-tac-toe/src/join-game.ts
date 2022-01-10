@@ -10,15 +10,20 @@ import { joinGame } from '../../shared/src/services/game-state-mutator';
 export const lambdaHandler = async (
     event: APIGatewayProxyEvent
 ): Promise<APIGatewayProxyResult> => {
-    let body: { gameStateId: string, playerId: string };
+    let body: {
+        gameStateId: string,
+        playerId: string,
+        playerSecret: string,
+    };
     try {
         body = eventProcessor<typeof body>({
             type: 'object',
             properties: {
                 gameStateId: { type: 'string' },
                 playerId: { type: 'string' },
+                playerSecret: { type: 'string' },
             },
-            required: ['gameStateId', 'playerId'],
+            required: ['gameStateId', 'playerId', 'playerSecret'],
             additionalProperties: false
         }, event);
     } catch (err) {
@@ -26,7 +31,7 @@ export const lambdaHandler = async (
     }
 
     try {
-        const gameState = await joinGame(body.gameStateId, body.playerId);
+        const gameState = await joinGame(body.gameStateId, body.playerId, body.playerSecret);
         return createSuccessResponse(SUCCESS_MESSAGE, { gameState })
     } catch (err) {
         return createErrorResponse(err);

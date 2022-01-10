@@ -4,19 +4,20 @@ import {
     createErrorResponse,
     createSuccessResponse, SUCCESS_MESSAGE
 } from '../../shared/src/utilities/response-helpers';
-import { createGame } from '../../shared/src/models/game-state';
+import { createGame } from '../../shared/src/services/game-state-mutator';
 
 export const lambdaHandler = async (
     event: APIGatewayProxyEvent
 ): Promise<APIGatewayProxyResult> => {
-    let body: { playerId: string };
+    let body: { playerId: string, playerSecret: string };
     try {
         body = eventProcessor<typeof body>({
             type: 'object',
             properties: {
                 playerId: { type: 'string' },
+                playerSecret: { type: 'string' },
             },
-            required: ['playerId'],
+            required: ['playerId', 'playerSecret'],
             additionalProperties: false
         }, event);
     } catch (err) {
@@ -24,7 +25,7 @@ export const lambdaHandler = async (
     }
 
     try {
-        const { id: gameStateId } = await createGame(body.playerId);
+        const { id: gameStateId } = await createGame(body.playerId, body.playerSecret);
         return createSuccessResponse(SUCCESS_MESSAGE, { gameStateId })
     } catch (err) {
         return createErrorResponse(err);
