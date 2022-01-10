@@ -3,7 +3,7 @@ import {
     Players,
     SessionStates,
     SquareStates
-} from '../../../shared/src/models/gameStates';
+} from '../../../shared/src/models/game-state';
 
 export function processPlayerMove(
     {x, y,}: { x: number, y: number },

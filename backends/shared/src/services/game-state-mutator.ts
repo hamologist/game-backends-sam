@@ -5,8 +5,8 @@ import {
     Players,
     SessionStates,
     SquareStates, updateState
-} from '../models/gameStates';
-import { getPlayer } from '../models/players';
+} from '../models/game-state';
+import { getPlayer } from '../models/player';
 import { playerValidator } from './player-validator';
 import { processPlayerMove } from '../../../tic-tac-toe/src/services/process-player-move';
 

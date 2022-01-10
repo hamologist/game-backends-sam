@@ -4,7 +4,7 @@ import {
     createErrorResponse,
     createSuccessResponse, SUCCESS_MESSAGE
 } from '../../shared/src/utilities/response-helpers';
-import { createGame } from '../../shared/src/models/gameStates';
+import { createGame } from '../../shared/src/models/game-state';
 
 export const lambdaHandler = async (
     event: APIGatewayProxyEvent

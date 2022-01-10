@@ -1,6 +1,6 @@
 import { APIGatewayProxyEvent, APIGatewayProxyResult } from 'aws-lambda';
 import { eventProcessor } from '../../shared/src/services/event-processor';
-import { createPlayer } from '../../shared/src/models/players';
+import { createPlayer } from '../../shared/src/models/player';
 import {
     createErrorResponse,
     createSuccessResponse,

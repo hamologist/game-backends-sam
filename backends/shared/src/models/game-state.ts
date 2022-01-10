@@ -50,8 +50,8 @@ export const getGame = async (
     gameStateId: string
 ): Promise<GameStateResult | null> => {
     const { Item: result } = await docClient.get({
-        TableName: 'GameStates',
-        Key: { 'Id': gameStateId },
+        TableName: 'gameState',
+        Key: { 'id': gameStateId },
     }).promise();
 
     if (result === undefined) {
@@ -59,10 +59,10 @@ export const getGame = async (
     }
 
     return {
-        id: result.Id,
-        playerOne: result.PlayerOne,
-        playerTwo: result.PlayerTwo,
-        state: result.State,
+        id: result.id,
+        playerOne: result.playerOne,
+        playerTwo: result.playerTwo,
+        state: result.state,
     };
 };
 
@@ -78,12 +78,12 @@ export const createGame = async (
     };
 
     await docClient.put({
-        TableName: 'GameStates',
+        TableName: 'gameState',
         Item: {
-            Id: gameStateId,
-            PlayerOne: playerId,
-            PlayerTwo: null,
-            State: gameState
+            id: gameStateId,
+            playerOne: playerId,
+            playerTwo: null,
+            state: gameState
         },
     }).promise();
 
@@ -100,9 +100,9 @@ export const addPlayer = async (
     playerId: string,
 ): Promise<GameStateResult> => {
     const { Attributes: result } = await docClient.update({
-        TableName: 'GameStates',
-        Key: { Id: gameStateId },
-        UpdateExpression: 'set PlayerTwo = :p',
+        TableName: 'gameState',
+        Key: { id: gameStateId },
+        UpdateExpression: 'set playerTwo = :p',
         ExpressionAttributeValues: {
             ':p': playerId
         },
@@ -114,10 +114,10 @@ export const addPlayer = async (
     }
 
     return {
-        id: result.ID,
-        playerOne: result.PlayerOne,
-        playerTwo: result.PlayerTwo,
-        state: result.State,
+        id: result.id,
+        playerOne: result.playerOne,
+        playerTwo: result.playerTwo,
+        state: result.state,
     };
 };
 
@@ -126,11 +126,11 @@ export const updateState = async (
     state: GameStateResult['state'],
 ): Promise<GameStateResult> => {
     const { Attributes: result } = await docClient.update({
-        TableName: 'GameStates',
-        Key: { Id: gameStateId },
+        TableName: 'gameState',
+        Key: { id: gameStateId },
         UpdateExpression: 'set #s = :s',
         ExpressionAttributeNames: {
-            '#s': 'State',
+            '#s': 'state',
         },
         ExpressionAttributeValues: {
             ':s': state
@@ -143,9 +143,9 @@ export const updateState = async (
     }
 
     return {
-        id: result.ID,
-        playerOne: result.PlayerOne,
-        playerTwo: result.PlayerTwo,
-        state: result.State,
+        id: result.id,
+        playerOne: result.playerOne,
+        playerTwo: result.playerTwo,
+        state: result.state,
     };
 };

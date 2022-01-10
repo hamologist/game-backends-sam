@@ -18,11 +18,11 @@ export const createPlayer = async (
     const playerSecret = randomBytes(20).toString('hex');
 
     await docClient.put({
-        TableName: 'Players',
+        TableName: 'player',
         Item: {
-            'Id': playerId,
-            'Secret': playerSecret,
-            'Username': username,
+            'id': playerId,
+            'secret': playerSecret,
+            'username': username,
         },
     }).promise();
 
@@ -37,9 +37,9 @@ export const getPlayer = async (
     playerId: string
 ): Promise<PlayerResult | null> => {
     const result = await docClient.get({
-        TableName: 'Players',
+        TableName: 'player',
         Key: {
-            'Id': playerId,
+            'id': playerId,
         },
     }).promise();
 
@@ -48,8 +48,8 @@ export const getPlayer = async (
     }
 
     return {
-        id: result.Item.Id,
-        secret: result.Item.Secret,
-        username: result.Item.Username,
+        id: result.Item.id,
+        secret: result.Item.secret,
+        username: result.Item.username,
     };
 }

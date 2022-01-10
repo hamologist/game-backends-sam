@@ -1,4 +1,4 @@
-import { getPlayer } from '../models/players';
+import { getPlayer } from '../models/player';
 
 export const playerValidator = async (
     playerId: string,

@@ -1,14 +1,14 @@
 {
   "AttributeDefinitions": [
     {
-      "AttributeName": "Id",
+      "AttributeName": "id",
       "AttributeType": "S"
     }
   ],
-  "TableName": "GameStates",
+  "TableName": "gameState",
   "KeySchema": [
     {
-      "AttributeName": "Id",
+      "AttributeName": "id",
       "KeyType": "HASH"
     }
   ],
@@ -18,8 +18,8 @@
   },
   "Tags": [
     {
-      "Key": "Table",
-      "Value": "GameStates"
+      "Key": "TableName",
+      "Value": "gameState"
     }
   ],
   "TableClass": "STANDARD"
