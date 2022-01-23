@@ -13,7 +13,7 @@ task('compile', () => {
         .pipe(dest('./build'));
 });
 task('watch-compile', () => {
-    watch('./src/**.ts', series(['compile']));
+    watch('./backends/**/src/**.ts', series(['compile']));
 });
 
 task('move-package', () => {
@@ -30,7 +30,7 @@ task('install-package', async () => {
         console.error(`stderr: ${stderr}`);
     });
 });
-task('package', series(['move-package', 'install-package']));
+task('package', series(['move-package']));
 
 task('build', parallel(['compile', 'package']));
 task('default', series(['build']));

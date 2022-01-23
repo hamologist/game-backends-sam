@@ -1,30 +1,25 @@
-import { DocumentClient } from 'aws-sdk/clients/dynamodb';
 import { randomUUID } from 'crypto';
+import { Board, Players, SessionStates, SquareStates } from '../types/game-state';
+import { documentClient } from './document-client';
+import { GetCommand, PutCommand, UpdateCommand } from '@aws-sdk/lib-dynamodb'
 
-const docClient = new DocumentClient({
-    endpoint: 'http://docker.for.mac.localhost:8000',
-});
-
-export enum Players {
-    PlayerOne,
-    PlayerTwo,
+const createBoard = (): Board => {
+    return [
+        [SquareStates.Empty, SquareStates.Empty, SquareStates.Empty],
+        [SquareStates.Empty, SquareStates.Empty, SquareStates.Empty],
+        [SquareStates.Empty, SquareStates.Empty, SquareStates.Empty],
+    ];
 }
 
-export enum SessionStates {
-    Playing,
-    Win,
-    Draw,
+const processAttributes = (
+    attributes: { [key: string]: any } | undefined,
+): GameStateResult => {
+    if (attributes === undefined) {
+        throw new Error('IMPOSSIBLE!');
+    }
+
+    return attributes as GameStateResult;
 }
-
-export enum SquareStates {
-    Empty,
-    Circle,
-    Cross,
-}
-
-export type BoardRow = [SquareStates, SquareStates, SquareStates];
-
-export type Board = [BoardRow, BoardRow, BoardRow];
 
 export interface GameStateResult {
     id: string;
@@ -38,32 +33,21 @@ export interface GameStateResult {
     };
 }
 
-function createBoard(): Board {
-    return [
-        [SquareStates.Empty, SquareStates.Empty, SquareStates.Empty],
-        [SquareStates.Empty, SquareStates.Empty, SquareStates.Empty],
-        [SquareStates.Empty, SquareStates.Empty, SquareStates.Empty],
-    ];
-}
-
 export const getGame = async (
     gameStateId: string
 ): Promise<GameStateResult | null> => {
-    const { Item: result } = await docClient.get({
-        TableName: 'gameState',
-        Key: { 'id': gameStateId },
-    }).promise();
+    const { Item: item } = await documentClient.send(
+        new GetCommand({
+            TableName: 'gameState',
+            Key: { 'id': gameStateId },
+        })
+    );
 
-    if (result === undefined) {
+    if (item === undefined) {
         return null;
     }
 
-    return {
-        id: result.id,
-        playerOne: result.playerOne,
-        playerTwo: result.playerTwo,
-        state: result.state,
-    };
+    return item as GameStateResult
 };
 
 export const createGame = async (
@@ -77,15 +61,17 @@ export const createGame = async (
         movesMade: 0,
     };
 
-    await docClient.put({
-        TableName: 'gameState',
-        Item: {
-            id: gameStateId,
-            playerOne: playerId,
-            playerTwo: null,
-            state: gameState
-        },
-    }).promise();
+    await documentClient.send(
+        new PutCommand({
+            TableName: 'gameState',
+            Item: {
+                id: gameStateId,
+                playerOne: playerId,
+                playerTwo: null,
+                state: gameState
+            },
+        })
+    )
 
     return {
         id: gameStateId,
@@ -99,53 +85,39 @@ export const addPlayer = async (
     gameStateId: string,
     playerId: string,
 ): Promise<GameStateResult> => {
-    const { Attributes: result } = await docClient.update({
-        TableName: 'gameState',
-        Key: { id: gameStateId },
-        UpdateExpression: 'set playerTwo = :p',
-        ExpressionAttributeValues: {
-            ':p': playerId
-        },
-        ReturnValues: 'ALL_NEW',
-    }).promise();
+    const { Attributes: attributes } = await documentClient.send(
+        new UpdateCommand({
+            TableName: 'gameState',
+            Key: { id: gameStateId },
+            UpdateExpression: 'set playerTwo = :p',
+            ExpressionAttributeValues: {
+                ':p': playerId
+            },
+            ReturnValues: 'ALL_NEW',
+        })
+    );
 
-    if (result === undefined) {
-        throw new Error('IMPOSSIBLE!');
-    }
-
-    return {
-        id: result.id,
-        playerOne: result.playerOne,
-        playerTwo: result.playerTwo,
-        state: result.state,
-    };
+    return processAttributes(attributes)
 };
 
 export const updateState = async (
     gameStateId: string,
     state: GameStateResult['state'],
 ): Promise<GameStateResult> => {
-    const { Attributes: result } = await docClient.update({
-        TableName: 'gameState',
-        Key: { id: gameStateId },
-        UpdateExpression: 'set #s = :s',
-        ExpressionAttributeNames: {
-            '#s': 'state',
-        },
-        ExpressionAttributeValues: {
-            ':s': state
-        },
-        ReturnValues: 'ALL_NEW',
-    }).promise();
+    const { Attributes: attributes } = await documentClient.send(
+        new UpdateCommand({
+            TableName: 'gameState',
+            Key: { id: gameStateId },
+            UpdateExpression: 'set #s = :s',
+            ExpressionAttributeNames: {
+                '#s': 'state',
+            },
+            ExpressionAttributeValues: {
+                ':s': state
+            },
+            ReturnValues: 'ALL_NEW',
+        })
+    );
 
-    if (result === undefined) {
-        throw new Error('IMPOSSIBLE!');
-    }
-
-    return {
-        id: result.id,
-        playerOne: result.playerOne,
-        playerTwo: result.playerTwo,
-        state: result.state,
-    };
+    return processAttributes(attributes)
 };

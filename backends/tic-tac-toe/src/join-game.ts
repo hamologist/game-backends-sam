@@ -1,5 +1,5 @@
 import { APIGatewayProxyEvent, APIGatewayProxyResult } from 'aws-lambda';
-import { eventProcessor } from '../../shared/src/services/event-processor';
+import { eventBodyProcessor } from '../../shared/src/services/event-processor';
 import {
     createErrorResponse,
     createSuccessResponse,
@@ -16,7 +16,7 @@ export const lambdaHandler = async (
         playerSecret: string,
     };
     try {
-        body = eventProcessor<typeof body>({
+        body = eventBodyProcessor<typeof body>({
             type: 'object',
             properties: {
                 gameStateId: { type: 'string' },

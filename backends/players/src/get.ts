@@ -1,5 +1,5 @@
 import { APIGatewayProxyEvent, APIGatewayProxyResult } from 'aws-lambda';
-import { eventProcessor } from '../../shared/src/services/event-processor';
+import { eventPathProcessor } from '../../shared/src/services/event-processor';
 import {
     createErrorResponse,
     createSuccessResponse,
@@ -10,14 +10,14 @@ import { getPlayer } from '../../shared/src/models/player';
 export const lambdaHandler = async (
     event: APIGatewayProxyEvent
 ): Promise<APIGatewayProxyResult> => {
-    let body: { playerId: string };
+    let body: { id: string };
     try {
-        body = eventProcessor<typeof body>({
+        body = eventPathProcessor<typeof body>({
             type: 'object',
             properties: {
-                playerId: { type: 'string' }
+                id: { type: 'string' }
             },
-            required: ['playerId'],
+            required: ['id'],
             additionalProperties: false
         }, event);
     } catch (err) {
@@ -25,7 +25,7 @@ export const lambdaHandler = async (
     }
 
     try {
-        const result = await getPlayer(body.playerId);
+        const result = await getPlayer(body.id);
         if (result === null) {
             return createErrorResponse('Provided playerId does not exist.')
         }

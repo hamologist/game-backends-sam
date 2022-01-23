@@ -1,9 +1,6 @@
-import { DocumentClient } from 'aws-sdk/clients/dynamodb';
 import { randomBytes, randomUUID } from 'crypto';
-
-const docClient = new DocumentClient({
-    endpoint: 'http://docker.for.mac.localhost:8000',
-});
+import { documentClient } from './document-client';
+import { GetCommand, PutCommand } from '@aws-sdk/lib-dynamodb';
 
 export interface PlayerResult {
     id: string;
@@ -17,14 +14,16 @@ export const createPlayer = async (
     const playerId = randomUUID();
     const playerSecret = randomBytes(20).toString('hex');
 
-    await docClient.put({
-        TableName: 'player',
-        Item: {
-            'id': playerId,
-            'secret': playerSecret,
-            'username': username,
-        },
-    }).promise();
+    await documentClient.send(
+        new PutCommand({
+            TableName: 'player',
+            Item: {
+                'id': playerId,
+                'secret': playerSecret,
+                'username': username,
+            },
+        })
+    );
 
     return {
         id: playerId,
@@ -36,12 +35,14 @@ export const createPlayer = async (
 export const getPlayer = async (
     playerId: string
 ): Promise<PlayerResult | null> => {
-    const result = await docClient.get({
-        TableName: 'player',
-        Key: {
-            'id': playerId,
-        },
-    }).promise();
+    const result = await documentClient.send(
+        new GetCommand({
+            TableName: 'player',
+            Key: {
+                'id': playerId,
+            },
+        })
+    );
 
     if (result.Item === undefined) {
         return null;

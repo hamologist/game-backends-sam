@@ -7,18 +7,22 @@
   },
   "version": "1.0.0",
   "description": "hello world sample for NodeJS",
-  "main": "players/src/create.ts",
   "repository": "https://github.com/awslabs/aws-sam-cli/tree/develop/samcli/local/init/templates/cookiecutter-aws-sam-hello-nodejs",
   "author": "SAM CLI",
   "license": "MIT",
   "dependencies": {
+    "@aws-sdk/client-dynamodb": "^3.48.0",
+    "@aws-sdk/lib-dynamodb": "^3.48.0",
     "ajv": "^8.8.2",
-    "aws-sdk": "^2.1048.0",
     "axios": "^0.21.1"
   },
   "scripts": {
-    "test": "mocha players/tests/unit",
-    "compile": "players/node_modules/.bin/tsc"
+    "build": "npm install && npx gulp && sam build",
+    "start-api": "sam local start-api --env-vars env.json",
+    "start-api-with-debug": "sam local start-api -p 3001 --env-vars env.json -d 9229",
+    "start-local-db": "docker-compose up &",
+    "debug": "npm run build && npm run start-local-db && npm run start-api-with-debug",
+    "start": "npm run build && npm run start-local-db && npm run start-api"
   },
   "devDependencies": {
     "@types/aws-lambda": "^8.10.88",

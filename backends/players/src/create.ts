@@ -1,5 +1,5 @@
 import { APIGatewayProxyEvent, APIGatewayProxyResult } from 'aws-lambda';
-import { eventProcessor } from '../../shared/src/services/event-processor';
+import { eventBodyProcessor } from '../../shared/src/services/event-processor';
 import { createPlayer } from '../../shared/src/models/player';
 import {
     createErrorResponse,
@@ -12,7 +12,7 @@ export const lambdaHandler = async (
 ): Promise<APIGatewayProxyResult> => {
     let body: { username: string };
     try {
-        body = eventProcessor<typeof body>({
+        body = eventBodyProcessor<typeof body>({
             type: 'object',
             properties: {
                 username: { type: 'string' }

@@ -3,13 +3,11 @@ import {
     createGame as _createGame,
     GameStateResult,
     getGame,
-    Players,
-    SessionStates,
-    SquareStates, updateState
+    updateState
 } from '../models/game-state';
-import { getPlayer } from '../models/player';
 import { playerValidator } from './player-validator';
 import { processPlayerMove } from '../../../tic-tac-toe/src/services/process-player-move';
+import { Players, SessionStates, SquareStates } from '../types/game-state';
 
 export const createGame = async (
     playerId: string,

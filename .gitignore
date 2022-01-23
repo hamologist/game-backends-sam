@@ -8,7 +8,7 @@
 
 # local dev
 **/events
-**/store/docker
+db/docker
 
 # testing
 /coverage
@@ -127,7 +127,7 @@ typings/
 .yarn-integrity
 
 # dotenv environment variables file
-.env
+test
 .env.test
 .env*.local
 

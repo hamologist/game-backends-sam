@@ -3,6 +3,29 @@ import { APIGatewayProxyEvent } from 'aws-lambda';
 
 const ajv = new AJV();
 
+const defaultPreProcessor = (payload: any): any => {
+    return payload;
+}
+
+const eventProcessor = <T>(
+    schema: JSONSchemaType<T>,
+    payload: any,
+    preProcessor: (payload: any) => any = defaultPreProcessor
+): T => {
+    if (payload === null) {
+        throw EventProcessorError.requiredFieldsAreMissing(schema);
+    }
+    payload = preProcessor(payload)
+
+    const validate = ajv.compile(schema);
+
+    if (!validate(payload)) {
+        throw new EventProcessorError(validate.errors!.join(', '));
+    }
+
+    return payload;
+}
+
 export class EventProcessorError extends Error {
     constructor(message: string) {
         super(message);
@@ -28,26 +51,24 @@ export class EventProcessorError extends Error {
 /**
  * @throws {EventProcessorError}
  */
-export const eventProcessor = <T>(
+export const eventBodyProcessor = <T>(
     schema: JSONSchemaType<T>,
     { body }: APIGatewayProxyEvent,
 ): T => {
-    if (body === null) {
-        throw EventProcessorError.requiredFieldsAreMissing(schema);
+    const preProcessor = (payload: any) => {
+        try {
+            return JSON.parse(payload);
+        } catch (err) {
+            throw new EventProcessorError(`JSON parse error: ${err}`);
+        }
     }
 
-    const validate = ajv.compile(schema);
+    return eventProcessor(schema, body, preProcessor)
+}
 
-    let result: T;
-    try {
-        result = JSON.parse(body);
-    } catch (err) {
-        throw new EventProcessorError(`JSON parse error: ${err}`);
-    }
-
-    if (!validate(result)) {
-        throw new EventProcessorError(validate.errors!.join(', '));
-    }
-
-    return result;
+export const eventPathProcessor = <T>(
+    schema: JSONSchemaType<T>,
+    { pathParameters }: APIGatewayProxyEvent,
+): T => {
+    return eventProcessor(schema, pathParameters);
 }
