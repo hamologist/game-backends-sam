@@ -5,6 +5,17 @@ Description: >
 
   Sample SAM Template for tic-tac-toe
 
+Parameters:
+  DomainName:
+    Type: String
+    Default: api.example.com
+  HostedZoneName:
+    Type: String
+    Default: example.com.
+  CertificateArn:
+    Type: String
+    Default: arn:aws:acm:us-east-1:...:certificate/...
+
 Globals:
   Function:
     Timeout: 3
@@ -15,6 +26,7 @@ Globals:
 Resources:
   PlayerCreateFunction:
     Type: AWS::Serverless::Function
+    DependsOn: PlayerDynamoDBTable
     Properties:
       CodeUri: build
       Handler: backends/players/src/create.lambdaHandler
@@ -27,8 +39,14 @@ Resources:
           Properties:
             Path: /player
             Method: post
+      Policies:
+        - DynamoDBWritePolicy:
+            TableName:
+              !Ref PlayerDynamoDBTable
+
   PlayerValidateFunction:
     Type: AWS::Serverless::Function
+    DependsOn: PlayerDynamoDBTable
     Properties:
       CodeUri: build
       Handler: backends/players/src/validate.lambdaHandler
@@ -41,8 +59,14 @@ Resources:
           Properties:
             Path: /player/validate
             Method: post
+      Policies:
+        - DynamoDBReadPolicy:
+            TableName:
+              !Ref PlayerDynamoDBTable
+
   PlayerGetFunction:
     Type: AWS::Serverless::Function
+    DependsOn: PlayerDynamoDBTable
     Properties:
       CodeUri: build
       Handler: backends/players/src/get.lambdaHandler
@@ -55,8 +79,14 @@ Resources:
           Properties:
             Path: /player/{id}
             Method: get
+      Policies:
+        - DynamoDBReadPolicy:
+            TableName:
+              !Ref PlayerDynamoDBTable
+
   TicTacToeGetFunction:
     Type: AWS::Serverless::Function
+    DependsOn: GameStateDynamoDBTable
     Properties:
       CodeUri: build
       Handler: backends/tic-tac-toe/src/get.lambdaHandler
@@ -69,8 +99,16 @@ Resources:
           Properties:
             Path: /tic-tac-toe/{id}
             Method: get
+      Policies:
+        - DynamoDBReadPolicy:
+            TableName:
+              !Ref GameStateDynamoDBTable
+
   TicTacToeJoinGameFunction:
     Type: AWS::Serverless::Function
+    DependsOn:
+      - GameStateDynamoDBTable
+      - PlayerDynamoDBTable
     Properties:
       CodeUri: build
       Handler: backends/tic-tac-toe/src/join-game.lambdaHandler
@@ -83,8 +121,22 @@ Resources:
           Properties:
             Path: /tic-tac-toe/join-game
             Method: post
+      Policies:
+        - DynamoDBReadPolicy:
+            TableName:
+              !Ref PlayerDynamoDBTable
+        - DynamoDBReadPolicy:
+            TableName:
+              !Ref GameStateDynamoDBTable
+        - DynamoDBWritePolicy:
+            TableName:
+              !Ref GameStateDynamoDBTable
+
   TicTacToeMakeMoveFunction:
     Type: AWS::Serverless::Function
+    DependsOn:
+      - GameStateDynamoDBTable
+      - PlayerDynamoDBTable
     Properties:
       CodeUri: build
       Handler: backends/tic-tac-toe/src/make-move.lambdaHandler
@@ -97,8 +149,22 @@ Resources:
           Properties:
             Path: /tic-tac-toe/make-move
             Method: post
+      Policies:
+        - DynamoDBReadPolicy:
+            TableName:
+              !Ref PlayerDynamoDBTable
+        - DynamoDBReadPolicy:
+            TableName:
+              !Ref GameStateDynamoDBTable
+        - DynamoDBWritePolicy:
+            TableName:
+              !Ref GameStateDynamoDBTable
+
   TicTacToeNewGameFunction:
     Type: AWS::Serverless::Function
+    DependsOn:
+      - GameStateDynamoDBTable
+      - PlayerDynamoDBTable
     Properties:
       CodeUri: build
       Handler: backends/tic-tac-toe/src/new-game.lambdaHandler
@@ -111,6 +177,17 @@ Resources:
           Properties:
             Path: /tic-tac-toe/new-game
             Method: post
+      Policies:
+        - DynamoDBReadPolicy:
+            TableName:
+              !Ref PlayerDynamoDBTable
+        - DynamoDBReadPolicy:
+            TableName:
+              !Ref GameStateDynamoDBTable
+        - DynamoDBWritePolicy:
+            TableName:
+              !Ref GameStateDynamoDBTable
+
   GameStateDynamoDBTable:
     Type: AWS::DynamoDB::Table
     Properties:
@@ -131,6 +208,7 @@ Resources:
           Key: "TableName"
           Value: "gameState"
       TableClass: "STANDARD"
+
   PlayerDynamoDBTable:
     Type: AWS::DynamoDB::Table
     Properties:
@@ -152,16 +230,70 @@ Resources:
           Value: "player"
       TableClass: "STANDARD"
 
-#Outputs:
+  APIDomainName:
+    Type: AWS::ApiGateway::DomainName
+    Properties:
+      CertificateArn: !Ref CertificateArn
+      DomainName: !Ref DomainName
+
+  APIBasePathMapping:
+    Type: AWS::ApiGateway::BasePathMapping
+    Properties:
+      DomainName: !Ref APIDomainName
+      RestApiId: !Ref ServerlessRestApi
+      Stage: Prod
+
+  APIDomain:
+    Type: AWS::Route53::RecordSetGroup
+    Properties:
+      HostedZoneName: !Ref HostedZoneName
+      RecordSets:
+        - Name: !Ref DomainName
+          Type: A
+          AliasTarget:
+            DNSName: !GetAtt APIDomainName.DistributionDomainName
+            HostedZoneId: Z2FDTNDATAQYW2 # static ID for CloudFront aliases
+
+Outputs:
   # ServerlessRestApi is an implicit API created out of Events key under Serverless::Function
   # Find out more about other implicit resources you can reference within SAM
   # https://github.com/awslabs/serverless-application-model/blob/master/docs/internals/generated_resources.rst#api
-#  HelloWorldApi:
-#    Description: "API Gateway endpoint URL for Prod stage for Hello World function"
-#    Value: !Sub "https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/hello/"
-#  HelloWorldFunction:
-#    Description: "Hello World Lambda Function ARN"
-#    Value: !GetAtt HelloWorldFunction.Arn
-#  HelloWorldFunctionIamRole:
-#    Description: "Implicit IAM Role created for Hello World function"
-#    Value: !GetAtt HelloWorldFunctionRole.Arn
+  GameBackendsBaseAPI:
+    Description: "API Gateway base URL for Prod environment for game-backends project"
+    Value: !Sub "https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/"
+  PlayerCreateFunction:
+    Description: "PlayerCreateFunction ARN"
+    Value: !GetAtt PlayerCreateFunction.Arn
+  PlayerCreateFunctionIamRole:
+    Description: "Implicit IAM Role created for PlayerCreateFunction"
+    Value: !GetAtt PlayerCreateFunctionRole.Arn
+  PlayerValidateFunction:
+    Description: "PlayerValidateFunction ARN"
+    Value: !GetAtt PlayerValidateFunction.Arn
+  PlayerValidateFunctionIamRole:
+    Description: "Implicit IAM Role created for PlayerValidateFunction"
+    Value: !GetAtt PlayerValidateFunctionRole.Arn
+  PlayerGetFunction:
+    Description: "PlayerGetFunction ARN"
+    Value: !GetAtt PlayerGetFunction.Arn
+  PlayerGetFunctionIamRole:
+    Description: "Implicit IAM Role created for PlayerGetFunction"
+    Value: !GetAtt PlayerGetFunctionRole.Arn
+  TicTacToeJoinGameFunction:
+    Description: "TicTacToeJoinGameFunction ARN"
+    Value: !GetAtt TicTacToeJoinGameFunction.Arn
+  TicTacToeJoinGameFunctionIamRole:
+    Description: "Implicit IAM Role created for TicTacToeJoinGameFunction"
+    Value: !GetAtt TicTacToeJoinGameFunctionRole.Arn
+  TicTacToeMakeMoveFunction:
+    Description: "TicTacToeMakeMoveFunction ARN"
+    Value: !GetAtt TicTacToeMakeMoveFunction.Arn
+  TicTacToeMakeMoveFunctionIamRole:
+    Description: "Implicit IAM Role created for TicTacToeMakeMoveFunction"
+    Value: !GetAtt TicTacToeMakeMoveFunctionRole.Arn
+  TicTacToeNewGameFunction:
+    Description: "TicTacToeNewGameFunction ARN"
+    Value: !GetAtt TicTacToeNewGameFunction.Arn
+  TicTacToeNewGameFunctionIamRole:
+    Description: "Implicit IAM Role created for TicTacToeNewGameFunction"
+    Value: !GetAtt TicTacToeNewGameFunctionRole.Arn
